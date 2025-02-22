@@ -1,6 +1,5 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json.Serialization;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Learning.Models;
