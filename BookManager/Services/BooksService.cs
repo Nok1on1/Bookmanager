@@ -66,10 +66,10 @@ public class BooksService
     /// </summary>
     public async Task<ReplaceOneResult> UpdateAsync(string title, Book updatedBook)
     {
-        var book = _booksCollection.Find(x => x.Title == title).FirstOrDefault();
+        var book = await _booksCollection.Find(x => x.Title == title).FirstOrDefaultAsync();
 
-        if (book is null || book.IsDeleted)
-            return new ReplaceOneResult.Acknowledged(0, 0, null);
+        if (book is null || book.IsDeleted) //Matched count = 0;
+            return new ReplaceOneResult.Acknowledged(0,0, null);
 
         updatedBook.Id = book.Id;
     return await _booksCollection.ReplaceOneAsync(x => x.Title == title, updatedBook);
