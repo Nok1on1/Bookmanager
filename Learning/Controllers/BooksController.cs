@@ -20,7 +20,7 @@ public class BooksController : ControllerBase
     /// <summary>
     /// Returns all the Books
     /// </summary>
-    [HttpGet("/getEveryBook", Name = "GetEveryBook")]
+    [HttpGet("/getEveryBookByPopularity", Name = "GetEveryBookByPopularity")]
     public async Task<List<string>> Get(int pageNum, int pageSize)
     {
         var books = await _booksService.GetByPopularityAsync(pageNum, pageSize);
