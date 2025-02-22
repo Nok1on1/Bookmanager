@@ -21,7 +21,7 @@ public class BooksController : ControllerBase
     /// Returns all the Books
     /// </summary>
     [HttpGet("/getEveryBookByPopularity", Name = "GetEveryBookByPopularity")]
-    public async Task<List<string>> Get(int pageNum, int pageSize)
+    public async Task<List<string>> Get(int pageNum = 1, int pageSize= 10)
     {
         var books = await _booksService.GetByPopularityAsync(pageNum, pageSize);
         return books.Select(b => b.Title).ToList();
