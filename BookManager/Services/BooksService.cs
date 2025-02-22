@@ -1,4 +1,5 @@
 using Learning.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -21,9 +22,9 @@ public class BooksService
         _booksCollection = database.GetCollection<Book>(mongoDbSettings.Value.CollectionName);
 
         // Make Title Primary Key
-            // Creates IndexKey on Title. Ascending Helps Speed Up A -> Z Query
+        // Creates IndexKey on Title. Ascending Helps Speed Up A -> Z Query
         var indexKeys = Builders<Book>.IndexKeys.Ascending(x => x.Title);
-            // Option Key To be Unique
+        // Option Key To be Unique
         var indexOptions = new CreateIndexOptions { Unique = true };
         var indexModel = new CreateIndexModel<Book>(indexKeys, indexOptions);
         _booksCollection.Indexes.CreateOneAsync(indexModel);
@@ -58,15 +59,23 @@ public class BooksService
     /// </summary>
     public async Task CreateAsync(IEnumerable<Book> books) =>
         // If One of the Books Fail It Will Still Insert Other Ones
-        await _booksCollection.InsertManyAsync(books,new InsertManyOptions { IsOrdered = false });
-    
+        await _booksCollection.InsertManyAsync(books, new InsertManyOptions { IsOrdered = false });
+
     /// <summary>
     /// updates The book
     /// </summary>
-    public async Task<ReplaceOneResult> UpdateAsync(string title, Book updatedBook) =>
-        await _booksCollection.ReplaceOneAsync(x => x.Title == title, updatedBook);
+    public async Task<ReplaceOneResult> UpdateAsync(string title, Book updatedBook)
+    {
+        var book = _booksCollection.Find(x => x.Title == title).FirstOrDefault();
 
-    /// <summary>
+        if (book is null || book.IsDeleted)
+            return new ReplaceOneResult.Acknowledged(0, 0, null);
+
+        updatedBook.Id = book.Id;
+    return await _booksCollection.ReplaceOneAsync(x => x.Title == title, updatedBook);
+    }
+
+/// <summary>
     /// Updates ViewCount of the given book in async (hopefully)
     /// </summary>
     public async Task UpdateViewCountAsync(string title) =>
